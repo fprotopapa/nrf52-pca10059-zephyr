@@ -26,13 +26,7 @@
 #include <bluetooth/gatt.h>
 
 #include <drivers/adc.h>
-// #ifdef CONFIG_TEMP_NRF5
-// static const struct device *temp_dev = DEVICE_DT_GET_ANY(nordic_nrf_temp);
-// #else
-// static const struct device *temp_dev;
-// #endif
 
-//static uint8_t simulate_htm;
 
 /**************** ADC start ******************************/
 
@@ -89,7 +83,6 @@ static const struct device* init_adc(int channel)
 		ret = adc_channel_setup(adc_dev, &m_1st_channel_cfg);
 		if(ret != 0)
 		{
-			//LOG_INF("Setting up of the first channel failed with code %d", ret);
 			adc_dev = NULL;
 		}
 		else
@@ -145,7 +138,6 @@ float AnalogRead(int channel)
 	}
 
 	// Convert the result to voltage
-	// Result = [V(p) - V(n)] * GAIN/REFERENCE / 2^(RESOLUTION)
 																				  
 	int multip = 256;
 	// find 2**adc_resolution
@@ -167,8 +159,8 @@ float AnalogRead(int channel)
 			break;
 	}
 	
-	// the 3.6 relates to the voltage divider being used in my circuit
-	float fout = (sv * 3.6 / multip);
+	// the 3.3 relates to the voltage divider being used in my circuit
+	float fout = (sv * 3.3 / multip);
 	return fout;
 }
 /**************** ADC end ******************************/
@@ -179,13 +171,11 @@ static struct bt_gatt_indicate_params ind_params;
 static void htmc_ccc_cfg_changed(const struct bt_gatt_attr *attr,
 				 uint16_t value)
 {
-	//simulate_htm = (value == BT_GATT_CCC_INDICATE) ? 1 : 0;
 }
 
 static void indicate_cb(struct bt_conn *conn,
 			struct bt_gatt_indicate_params *params, uint8_t err)
 {
-	//printk("Indication %s\n", err != 0U ? "fail" : "success");
 }
 
 static void indicate_destroy(struct bt_gatt_indicate_params *params)
@@ -206,28 +196,17 @@ BT_GATT_SERVICE_DEFINE(hts_svc,  //
 
 void hts_init(void)
 {
-	//temp_dev = NULL;
 }
 
 void hts_indicate(void)
 {
-	/* Temperature measurements simulation */
-	//struct sensor_value temp_value;
-
-	
 	static uint8_t htm[5];
 	double temperature = AnalogRead(7);
-	// if(temperature < 30) {
-	// 	temperature+=1;
-	// } else {
-	// 	temperature = 20U;
-	// }
+	/* Calculate temperaature */
+	temperature = (temperature - 0.4)/0.0195; /* V_out - V_0(400mV at 0dC) / T_c(19.5mV Temp. Coef.) */
+
 	uint32_t mantissa;
 	uint8_t exponent;
-
-	//r = sensor_channel_get(temp_dev, SENSOR_CHAN_DIE_TEMP,
-	//		       &temp_value);
-	//temperature = sensor_value_to_double(&temp_value);
 
 	mantissa = (uint32_t)(temperature * 100);
 	exponent = (uint8_t)-2;
@@ -244,6 +223,5 @@ void hts_indicate(void)
 
 	if (bt_gatt_indicate(NULL, &ind_params) == 0) {
 		indicating = 1U;
-	}
-	
+	}	
 }

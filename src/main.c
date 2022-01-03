@@ -19,7 +19,6 @@
 #include <bluetooth/conn.h>
 #include <bluetooth/uuid.h>
 #include <bluetooth/gatt.h> 
-//#include <bluetooth/services/bas.h>
 
 #include "hts.h"
 
@@ -27,8 +26,6 @@ static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
 		      BT_UUID_16_ENCODE(BT_UUID_HTS_VAL)),
-//		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
-//		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
 };
 
 static void connected(struct bt_conn *conn, uint8_t err)
@@ -55,8 +52,6 @@ static void bt_ready(void)
 	int err;
 
 	printk("Bluetooth initialized\n");
-
-	//hts_init();
 
 	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
@@ -101,7 +96,7 @@ void main(void)
 	while (1) {
 		k_sleep(K_SECONDS(1));
 
-		/* Temperature measurements simulation */
+		/* Temperature measurement*/
 		hts_indicate();
 	}
 }
