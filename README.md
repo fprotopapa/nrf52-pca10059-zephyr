@@ -4,10 +4,12 @@
 
 ## Requirements
 
-# Hardware
+### Hardware
 
 - nRF52-Dongle
 - MCP9701-E/TO
+
+### Software
 
 ## Build and Flash
 
