@@ -2,6 +2,8 @@
 
 ## Description
 
+Send temperature data via Bluetooth using nRF52-Dongle + MCP9701 and Zephyr RTOS
+
 ## Requirements
 
 ### Hardware
